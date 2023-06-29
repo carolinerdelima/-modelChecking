@@ -23,7 +23,7 @@ NuSMV -int
 
 3. No prompt do NuSMV, execute os seguintes comandos para carregar e verificar o arquivo SMV:
 ```
-NuSMV > read_model -i main.smv
+NuSMV > read_model -i semaforo.smv
 NuSMV > flatten_hierarchy
 NuSMV > encode_variables
 NuSMV > build_model
