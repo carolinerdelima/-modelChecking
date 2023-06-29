@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+-- Trabalho 2 Métodos Formais - T30 - Caroline Lima e Joana Figueredo    --
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+-- TEMPORIZADOR                                                          --
+---------------------------------------------------------------------------
+
+MODULE temporizador(reset)
+  VAR 
+    tempo : 0 .. 3;
+  ASSIGN
+    init(tempo) := 0;
+    next(tempo) := 
+      case
+        reset : 0;
+        tempo = 3 : 3;
+        TRUE : tempo + 1;
+      esac;
+  DEFINE
+    timeout := tempo = 3;
+
+---------------------------------------------------------------------------
+-- CONTROLADOR                                                           --
+---------------------------------------------------------------------------
+
+MODULE main
+  VAR
+    semaforoOeste : {verde,vermelho};
+    semaforoLeste : {verde, vermelho};
+    sensorOeste : boolean;
+    sensorLeste : boolean;
+    sensorNaPonte : boolean;
+    reset : boolean;
+    tempo: temporizador(reset);
+    prioridade: {prioridadeOeste, prioridadeLeste};
+    carroNaPonte : boolean;
+
+  ASSIGN
+    init(semaforoLeste) := vermelho;
+    init(semaforoOeste) := vermelho;
+    init(sensorLeste) := FALSE;
+    init(sensorOeste) := FALSE;
+    init(sensorNaPonte) := FALSE;
+    init(reset) := TRUE;
+    init(prioridade) := prioridadeOeste;
+    init(carroNaPonte) := FALSE;
+
+    -- De vermelho pra verde nos dois semáforos
+    next(semaforoLeste) := 
+    case 
+      (sensorLeste = TRUE) & (sensorNaPonte = FALSE) & (prioridade = prioridadeLeste) : verde;
+      (semaforoLeste = verde) & (tempo.timeout = TRUE) : vermelho;
+      TRUE : semaforoLeste;
+    esac;
+    next(semaforoOeste) := 
+    case 
+      (sensorOeste = TRUE) & (sensorNaPonte = FALSE) & (prioridade = prioridadeOeste) : verde;
+      (semaforoOeste = verde) & (tempo.timeout = TRUE) : vermelho;
+      TRUE : semaforoOeste;
+    esac;
+
+    
+    next(reset) := 
+    case 
+      (semaforoLeste = verde) & (tempo.timeout = TRUE) : TRUE;
+      (semaforoOeste = verde) & (tempo.timeout = TRUE) : TRUE;
+      TRUE : reset;
+      (semaforoOeste = vermelho) & (semaforoLeste = vermelho) & (sensorOeste = TRUE) & (sensorNaPonte = FALSE) & (prioridade = prioridadeOeste) : FALSE;
+      (semaforoLeste = vermelho) & (semaforoOeste = vermelho) & (sensorLeste = TRUE) & (sensorNaPonte = FALSE) & (prioridade = prioridadeLeste) : FALSE;
+    esac;
+
+
+    next(prioridade) := 
+    case
+      (semaforoLeste = verde) & (semaforoOeste = vermelho) : prioridadeOeste;
+      (semaforoOeste = verde) & (semaforoLeste = vermelho) : prioridadeLeste;
+      (semaforoLeste = vermelho) & (semaforoOeste = vermelho) & (sensorNaPonte = FALSE) : (
+        case
+          (prioridade = prioridadeLeste) : prioridadeOeste;
+          (prioridade = prioridadeOeste) : prioridadeLeste;
+        esac 
+      );
+      TRUE : prioridade;
+    esac;
+
+
+---------------------------------------------------------------------------
+-- PROPRIEDADES                                                          --
+---------------------------------------------------------------------------
+
+--LTL
+
+-- Nunca é o caso que ambos os semáforos são verdes ao mesmo tempo
+LTLSPEC G(!(semaforoLeste = verde & semaforoOeste = verde))
+
+-- Se um semáforo é "verde", então eventualmente ele será "vermelho"
+LTLSPEC G(semaforoLeste = verde -> F semaforoLeste = vermelho)
+LTLSPEC G(semaforoOeste = verde -> F semaforoOeste = vermelho)
+
+
+-- Sempre que existir um veículo na entrada do lado oeste da ponte, eventualmente o
+-- semáforo do lado oeste sera “verde”, dadas as seguintes suposições:
+-- 1 - se veículos estão sobre a ponte, eventualmente todos os veículos sairão da ponte
+-- 2 - se um veículo esta em um semáforo “vermelho”, ele permanece no semáforo
+-- 3 - sob a luz “vermelha” até e incluindo o primeiro passo (se existir um) no qual o
+-- semáforo muda para “verde”
+LTLSPEC G(((sensorOeste = TRUE) & G(sensorNaPonte = TRUE -> F sensorNaPonte = FALSE) & G(semaforoOeste = vermelho) -> (semaforoOeste = vermelho) U (semaforoOeste = verde))) -> F (semaforoOeste = verde)
+
+
+-- CTL
+
+-- Em algum momento o semáforo do lado oeste é “verde” e em algum momento o
+-- semáforo do lado leste é “verde”
+CTLSPEC EF semaforoLeste = verde & EF semaforoOeste = verde
+
+-- Sempre que o semáforo do lado leste estiver “verde” e um veículo estiver sobre 
+-- a ponte, é possivel que o semáforo do lado leste permaneca “verde” para sempre
+CTLSPEC AG((semaforoLeste = verde & carroNaPonte = TRUE) -> EF (AG semaforoLeste = verde))
