@@ -1,0 +1,53 @@
+O modelo NuXMV inicial fornecido para este trabalho (disponível no arquivo t2_1_2023.smv) descreve a base
+para um modelo do funcionamento de um cruzamento sobre um rio através de uma ponte de
+mão-única. Na entrada de cada extremo da ponte existe uma sinaleira (com sinal “vermelho” ou
+“verde”) que controla a liberação de passagem dos automóveis.
+
+(Ver Figura1.png)
+
+Na superfície da rodovia e da ponte existem sensores para detectar se veículos estão presentes
+em certas regiões. Atualmente existem três sensores que fornecem uma informação de presença
+ou ausência de veículos:
+
+    • Sensor1: veículos estão presentes na entrada do lado oeste da ponte;
+    • Sensor2: veículos estão presentes na entrada do lado leste da ponte;
+    • Sensor3: veículos estão presentes sobre a ponte.
+
+Com base nos sinais dos sensores, um controlador é responsável por controlar a cor que cada
+um dos dois semáforos (um do lado oeste e outro do lado leste) deve apresentar: verde (para
+permitir a passagem de veículos) ou vermelho (para impedir a passagem de veículos).
+
+Deseja-se um modelo para o controlador que não cause qualquer acidente sobre a ponte.
+No modelo base fornecido no Moodle, existe um módulo nomeado “temporizador” que deve
+obrigatoriamente ser utilizado para controlar o “tempo” (número de passos discretos) que a luz
+de um semáforo deve permanecer “verde”. Tal “temporizador” é útil para evitar que os semáforos
+permaneçam “verde” de forma indefinida. O “temporizador” recebe como entrada uma indicação
+de reset (para reiniciar a contagem) e gera como saída uma indicação de timeout (para indicar o
+final da contagem).
+
+O objetivo do trabalho é:
+    1. Completar o modelo através da formalização das relações de transição necessárias,
+    2. Formalizar as propriedades fornecidas neste enunciado em lógica temporal,
+    3. Indicar o resultado da avaliação de cada fórmula explicando se é algo desejável ou indica
+    que o modelo está inadequado.
+
+Propriedades:
+As seguintes propriedades (em LTL) deverão ser especificadas em lógica temporal:
+    • Propriedade de segurança: nunca é o caso que ambos os semáforos são “verde” ao
+    mesmo tempo.
+    • Propriedade de vivacidade: se um semáforo é “verde”, então eventualmente ele será
+    “vermelho”.
+    • Sempre que existir um veículo na entrada do lado oeste da ponte, eventualmente o
+    semáforo do lado oeste será “verde”, dadas as seguintes suposições:
+        - Se veículos estão sobre a ponte, eventualmente todos os veículos sairão da
+        ponte;
+        - Se um veículo está em um semáforo “vermelho”, ele permanece no semáforo
+        sob a luz “vermelha” até e incluindo o primeiro passo (se existir um) no qual o
+        semáforo muda para “verde”.
+    • Idem ao anterior para o lado leste.
+
+As seguintes propriedades (em CTL) deverão ser especificadas em lógica temporal:
+    • Em algum momento o semáforo do lado oeste é “verde” e em algum momento o
+    semáforo do lado leste é “verde”.
+    • Sempre que o semáforo do lado leste estiver “verde” e um veículo estiver sobre a ponte,
+    é possível que o semáforo do lado leste permaneça “verde” para sempre.
