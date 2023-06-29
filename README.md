@@ -1,7 +1,7 @@
 # Model Checking
 Modelos de sistema e verificação de propriedades sobre o modelo usando a verificador de modelos NuXMV
 
-Este é o README.md para o código do Trabalho 2 da disciplina de Métodos Formais. O código consiste em dois módulos: "temporizador" e "main". O módulo "temporizador" implementa um temporizador com um limite de contagem de 0 a 3. O módulo "main" é o controlador principal que controla os semáforos e os sensores.
+Este é o README.md para o código do Trabalho 2 da disciplina de Métodos Formais desenvolvido por Caroline Lima e Joana Figueredo. O código consiste em dois módulos: "temporizador" e "main". O módulo "temporizador" implementa um temporizador com um limite de contagem de 0 a 3. O módulo "main" é o controlador principal que controla os semáforos e os sensores.
 
 
 ## Como testar o código usando NuSMV
